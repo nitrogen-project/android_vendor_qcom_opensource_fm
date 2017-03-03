@@ -44,6 +44,7 @@ import android.content.IntentFilter;
 import android.app.IntentService;
 import android.os.UserHandle;
 import android.content.BroadcastReceiver;
+import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.AudioSystem;
@@ -601,6 +602,19 @@ public class FMRadioService extends Service
        }
    }
 
+    private void updateHeadsetStatus() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        AudioDeviceInfo[] devices = audioManager.getDevices(AudioManager.GET_DEVICES_ALL);
+        mHeadsetPlugged = false;
+        for (AudioDeviceInfo device : devices) {
+            switch (device.getType()) {
+                case AudioDeviceInfo.TYPE_WIRED_HEADPHONES:
+                case AudioDeviceInfo.TYPE_WIRED_HEADSET:
+                    mHeadsetPlugged = true;
+            }
+        }
+    }
+
      /**
      * Registers an intent to listen for ACTION_HEADSET_PLUG
      * notifications. This intent is called to know if the headset
@@ -615,13 +629,9 @@ public class FMRadioService extends Service
                     String action = intent.getAction();
                     Log.d(LOGTAG, "on receive HeadsetListener " + action);
                     if (action.equals(Intent.ACTION_HEADSET_PLUG)) {
-                       Log.d(LOGTAG, "ACTION_HEADSET_PLUG Intent received");
                        // Listen for ACTION_HEADSET_PLUG broadcasts.
-                       Log.d(LOGTAG, "mReceiver: ACTION_HEADSET_PLUG");
-                       Log.d(LOGTAG, "==> intent: " + intent);
-                       Log.d(LOGTAG, "    state: " + intent.getIntExtra("state", 0));
-                       Log.d(LOGTAG, "    name: " + intent.getStringExtra("name"));
-                       mHeadsetPlugged = (intent.getIntExtra("state", 0) == 1);
+                       updateHeadsetStatus();
+                       Log.d(LOGTAG, "ACTION_HEADSET_PLUG Intent received, plugged in: " + mHeadsetPlugged);
                        // if headset is plugged out it is required to disable
                        // in minimal duration to avoid race conditions with
                        // audio policy manager switch audio to speaker.
