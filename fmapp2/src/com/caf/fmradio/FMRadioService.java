@@ -127,7 +127,7 @@ public class FMRadioService extends Service
    private BroadcastReceiver mAirplaneModeChanged;
    private IFMRadioServiceCallbacks mCallbacks;
    private static FmSharedPreferences mPrefs;
-   private boolean mHeadsetPlugged = false;
+   private int mHeadsetPlugged = 0;
    private boolean mInternalAntennaAvailable = false;
    private WakeLock mWakeLock;
    private int mServiceStartId = -1;
@@ -617,16 +617,29 @@ public class FMRadioService extends Service
                     if (action.equals(Intent.ACTION_HEADSET_PLUG)) {
                        Log.d(LOGTAG, "ACTION_HEADSET_PLUG Intent received");
                        // Listen for ACTION_HEADSET_PLUG broadcasts.
+                       int state = intent.getIntExtra("state", 0);
+                       int microphone = intent.getIntExtra("microphone", -1);
                        Log.d(LOGTAG, "mReceiver: ACTION_HEADSET_PLUG");
                        Log.d(LOGTAG, "==> intent: " + intent);
-                       Log.d(LOGTAG, "    state: " + intent.getIntExtra("state", 0));
+                       Log.d(LOGTAG, "    state: " + state);
                        Log.d(LOGTAG, "    name: " + intent.getStringExtra("name"));
-                       mHeadsetPlugged = (intent.getIntExtra("state", 0) == 1);
-                       // if headset is plugged out it is required to disable
-                       // in minimal duration to avoid race conditions with
-                       // audio policy manager switch audio to speaker.
-                       mHandler.removeCallbacks(mHeadsetPluginHandler);
-                       mHandler.post(mHeadsetPluginHandler);
+                       Log.d(LOGTAG, "    mic: " + microphone);
+                       if (microphone >= 0) {
+                           int device;
+                           if (microphone != 0)
+                               device = AudioManager.DEVICE_OUT_WIRED_HEADSET;
+                           else
+                               device = AudioManager.DEVICE_OUT_WIRED_HEADPHONE;
+                           if (state != 0)
+                               mHeadsetPlugged |= device;
+                           else
+                               mHeadsetPlugged &= ~device;
+                           // if headset is plugged out it is required to disable
+                           // in minimal duration to avoid race conditions with
+                           // audio policy manager switch audio to speaker.
+                           mHandler.removeCallbacks(mHeadsetPluginHandler);
+                           mHandler.post(mHeadsetPluginHandler);
+                       }
                     } else if(mA2dpDeviceState.isA2dpStateChange(action) &&
                              (mA2dpDeviceState.isConnected(intent) ||
                               mA2dpDeviceState.isDisconnected(intent))) {
@@ -701,7 +714,7 @@ public class FMRadioService extends Service
                     Log.d(LOGTAG, "FMMediaButtonIntentReceiver.AUDIO_BECOMING_NOISY");
                     String intentAction = intent.getAction();
                     if (FMMediaButtonIntentReceiver.AUDIO_BECOMING_NOISY.equals(intentAction)) {
-                        mHeadsetPlugged = false;
+                        mHeadsetPlugged = 0;
                        if (isFmOn())
                        {
                            /* Disable FM and let the UI know */
@@ -2978,7 +2991,7 @@ public class FMRadioService extends Service
    public boolean isAntennaAvailable()
    {
       boolean bAvailable = false;
-      if ((mInternalAntennaAvailable) || (mHeadsetPlugged) )
+      if ((mInternalAntennaAvailable) || (mHeadsetPlugged != 0) )
       {
          bAvailable = true;
       }
@@ -3039,7 +3052,7 @@ public class FMRadioService extends Service
     */
    public boolean isWiredHeadsetAvailable()
    {
-      return (mHeadsetPlugged);
+      return (mHeadsetPlugged != 0);
    }
    public boolean isCallActive()
    {
