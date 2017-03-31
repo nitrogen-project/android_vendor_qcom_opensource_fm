@@ -2352,7 +2352,7 @@ private Runnable mSpeakerDisableTask = new Runnable() {
       {
          bAvailable = true;
       }
-      return bAvailable;
+      return true;
    }
 
    public static long getAvailableSpace() {

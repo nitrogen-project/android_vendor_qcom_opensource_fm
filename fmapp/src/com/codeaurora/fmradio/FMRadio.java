@@ -1066,7 +1066,7 @@ public class FMRadio extends Activity
              e.printStackTrace();
           }
        }
-       return bAvailable;
+       return true;
 
     }
     boolean isCallActive(){

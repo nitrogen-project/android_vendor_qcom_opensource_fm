@@ -3012,7 +3012,7 @@ public class FMRadioService extends Service
       {
          bAvailable = true;
       }
-      return bAvailable;
+      return true;
    }
 
    public static long getAvailableSpace() {
