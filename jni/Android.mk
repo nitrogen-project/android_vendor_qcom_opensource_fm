@@ -17,7 +17,8 @@ LOCAL_LDLIBS += -ldl
 LOCAL_SHARED_LIBRARIES := \
         libandroid_runtime \
         libnativehelper \
-        libcutils
+        libcutils \
+        liblog
 
 ifeq ($(TARGET_COMPILE_WITH_MSM_KERNEL),true)
 LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
