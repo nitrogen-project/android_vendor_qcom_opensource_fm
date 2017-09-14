@@ -13,6 +13,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, qcom/fmradio)
 LOCAL_JNI_SHARED_LIBRARIES := libqcomfm_jni
 
 LOCAL_MODULE:= qcom.fmradio
+LOCAL_PROPRIETARY_MODULE := true
 
 include $(BUILD_JAVA_LIBRARY)
 
@@ -21,7 +22,7 @@ LOCAL_MODULE := qcom.fmradio.xml
 LOCAL_SRC_FILES := qcom/fmradio/$(LOCAL_MODULE)
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_PATH := $(TARGET_OUT)/etc/permissions
+LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR_ETC)/permissions
 include $(BUILD_PREBUILT)
 
 ifeq ($(BOARD_HAS_QCA_FM_SOC), "cherokee")

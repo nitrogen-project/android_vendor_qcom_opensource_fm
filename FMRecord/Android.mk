@@ -10,6 +10,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src/com/codeaurora/fmrecording/)
 LOCAL_PACKAGE_NAME := FMRecord
 LOCAL_CERTIFICATE := platform
 LOCAL_PROGUARD_ENABLED := disabled
+LOCAL_PROPRIETARY_MODULE := true
 include $(BUILD_PACKAGE)
 endif
 endif # BOARD_HAVE_QCOM_FM

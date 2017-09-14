@@ -20,6 +20,7 @@ LOCAL_C_INCLUDES += $(FM_HCI_DIR)/fm_hci
 
 LOCAL_MODULE := fm_helium
 LOCAL_MODULE_TAGS := optional
+LOCAL_PROPRIETARY_MODULE := true
 
 include $(BUILD_SHARED_LIBRARY)
 
